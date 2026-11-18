@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#f3f4f0">
+<meta name="description" content="다녀온 페스티벌과 티켓값을 기록하고 이미지로 공유하세요.">
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="style.css">
+<title>페스티벌 장부</title>
+<script defer src="prices.js"></script>
+<script defer src="booking.js"></script>
+<script defer src="share-image.js"></script>
+<script defer src="app.js"></script>
+</head>
+<body>
+<div class="wrap">
+  <header><a href="./">페스티벌 장부</a><nav class="header-links" aria-label="문의 및 저장소"><a class="header-contact" href="mailto:gngbn0616@gmail.com?subject=%ED%8E%98%EC%8A%A4%ED%8B%B0%EB%B2%8C%20%EC%9E%A5%EB%B6%80%20%EB%AC%B8%EC%9D%98">메일 문의</a><a class="header-contact" href="https://github.com/gangbin0616/festival-ledger" target="_blank" rel="noopener noreferrer">GitHub</a></nav></header>
+  <main>
+    <h1 id="title">내 페스티벌</h1>
+    <p class="intro">다녀온 축제의 지출을 적고, 연도별 합계와 공유 이미지를 확인해요.</p>
+    <div class="workspace">
+    <aside class="overview" aria-label="지출 요약">
+    <label class="year-filter" id="year-filter-wrap" for="summary-year">집계 연도
+      <select id="summary-year" aria-label="지출 집계 연도">
+        <option value="2026">2026년</option>
+        <option value="all">전체 기간</option>
+      </select>
+    </label>
+    <section class="ledger" aria-label="기록 요약">
+      <div><span>다녀온 행사</span><strong id="count">0개</strong></div>
+      <div><span>총지출</span><strong id="total">0원</strong></div>
+      <button id="share" class="primary" disabled>공유 이미지 만들기</button>
+    </section>
+    <dl id="breakdown" aria-label="항목별 지출"><div><dt>티켓</dt><dd id="ticket-total"></dd></div><div><dt>예매수수료</dt><dd id="booking-total"></dd></div><div><dt>배송비</dt><dd id="shipping-total"></dd></div><div><dt>교통</dt><dd id="transport-total"></dd></div><div><dt>숙박</dt><dd id="lodging-total"></dd></div><div><dt>MD</dt><dd id="merch-total"></dd></div><div><dt>식비</dt><dd id="food-total"></dd></div><div><dt>맥주</dt><dd id="beer-total"></dd><dd id="beer-stats" hidden></dd></div></dl>
+    </aside>
+    <div class="records">
+    <p id="notice" role="status" hidden></p>
+    <section id="editor" aria-labelledby="list-title">
+      <h2 id="list-title">페스티벌 목록</h2>
+      <div class="toolbar">
+        <div class="filters" aria-label="목록 필터">
+          <button id="all" aria-pressed="true">전체 <span id="all-count"></span></button>
+          <button id="visited" aria-pressed="false">다녀온 곳 <span id="visited-count"></span></button>
+        </div>
+        <div class="toolbar-controls">
+          <input id="search" type="search" aria-label="행사 검색" placeholder="행사명 또는 장소 검색">
+          <select id="sort-order" aria-label="행사 정렬">
+            <option value="name">가나다순</option>
+            <option value="date">날짜순</option>
+          </select>
+        </div>
+      </div>
+    </section>
+    <section id="shared-heading" hidden><h2>다녀온 페스티벌</h2><p>공유할 때의 기록입니다.</p></section>
+    <ul id="list" aria-label="페스티벌 목록"><li class="empty">목록을 불러오는 중…</li></ul>
+    <footer id="local-footer"><span>로그인 없이 사용해요. 기록은 이 브라우저에 저장되고, 공유 이미지는 이 기기에서 만들어요.</span><button id="reset" class="plain">전체 기록 삭제</button></footer>
+    <footer id="shared-footer" hidden><a class="primary" href="./">내 기록 열기</a></footer>
+    </div>
+    </div>
+  </main>
+</div>
+<dialog id="share-dialog" aria-labelledby="share-title">
+  <form method="dialog">
+    <div class="share-heading"><h2 id="share-title">공유 이미지</h2><button value="close">닫기</button></div>
+    <label class="check-label"><input id="include-prices" type="checkbox"> 지출 금액 표시</label>
+    <div class="share-preview"><canvas id="share-canvas" role="img" aria-label="공유 이미지 미리보기"></canvas></div>
+    <div id="share-pages" class="share-pages" hidden>
+      <button type="button" id="prev-image">이전</button><span id="share-page" aria-live="polite"></span><button type="button" id="next-image">다음</button>
+    </div>
+    <p id="copy-status" role="status" hidden></p>
+    <div class="dialog-actions"><button type="button" id="native-share" hidden>앱으로 공유</button><button type="button" id="download-image" class="primary">PNG 저장</button></div>
+  </form>
+</dialog>
+<dialog id="split-dialog" aria-labelledby="split-title">
+  <form id="split-form">
+    <h2 id="split-title">히어로 락 티켓값 배분</h2>
+    <p id="split-original"></p>
+    <label class="field-label" for="split-seoul">봄 서울 티켓값 (원)</label><input id="split-seoul" type="number" min="0" max="100000000" step="1" inputmode="numeric">
+    <label class="field-label" for="split-incheon">12월 인천 티켓값 (원)</label><input id="split-incheon" type="number" min="0" max="100000000" step="1" inputmode="numeric">
+    <p>해당하지 않는 회차는 비워 두세요. 이미 기록한 회차에는 입력한 티켓값을 더합니다.</p>
+    <p id="split-error" role="alert"></p>
+    <div class="dialog-actions"><button type="button" id="split-cancel">취소</button><button class="primary">배분 저장</button></div>
+  </form>
+</dialog>
+</body>
+</html>
+
